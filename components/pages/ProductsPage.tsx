@@ -4,6 +4,7 @@ import { Package, BarChart3, Plus } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { useApp } from "../../context/AppContext"
 import { useProducts } from "../../hooks/useApi"
 import { MetricCard } from "../shared/MetricCard"
 import { DataTable } from "../shared/DataTable"
@@ -17,7 +18,7 @@ import { ToastContainer } from "../Toast"
 
 export function ProductsPage() {
   const [page, setPage] = useState(1)
-  const [search, setSearch] = useState("")
+  const { searchTerm, setSearchTerm } = useApp()
   const [status, setStatus] = useState("")
   const [productFormOpen, setProductFormOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<any>(undefined)
@@ -43,9 +44,12 @@ export function ProductsPage() {
     createProduct,
     updateProduct,
     deleteProduct,
-  } = useProducts({ page, limit: 10, search, status })
+  } = useProducts({ page, limit: 10, search: searchTerm, status })
 
   const totalInventory = products.reduce((sum: number, p: any) => sum + p.inventory, 0)
+  const filteredProducts = products.filter((p: any) =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleEditProduct = (product: any) => {
     setEditingProduct(product)
@@ -141,10 +145,11 @@ export function ProductsPage() {
         <CardContent>
           {/* Search and Filter */}
           <SearchAndFilter
-            onSearch={setSearch}
+            onSearch={setSearchTerm}
             onStatusFilter={setStatus}
             placeholder="Search products..."
             className="mb-6"
+            showSearch={false}
           />
 
           {/* Loading State */}
@@ -156,7 +161,7 @@ export function ProductsPage() {
             <>
               {/* Data Table */}
               <DataTable
-                data={products}
+                data={filteredProducts}
                 columns={productColumns}
                 onEdit={handleEditProduct}
                 onDelete={handleDeleteProduct}

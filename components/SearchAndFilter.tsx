@@ -10,6 +10,7 @@ interface SearchAndFilterProps {
   onStatusFilter: (status: string) => void
   placeholder?: string
   showStatusFilter?: boolean
+  showSearch?: boolean
   className?: string
 }
 
@@ -18,6 +19,7 @@ export function SearchAndFilter({
   onStatusFilter,
   placeholder = "Search...",
   showStatusFilter = true,
+  showSearch = true,
   className = "",
 }: SearchAndFilterProps) {
   const [searchTerm, setSearchTerm] = useState("")
@@ -35,15 +37,17 @@ export function SearchAndFilter({
 
   return (
     <div className={`flex items-center gap-4 ${className}`}>
-      <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9197b3] w-4 h-4" />
-        <Input
-          placeholder={placeholder}
-          value={searchTerm}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          className="pl-10 bg-white border-[#cecece]"
-        />
-      </div>
+      {showSearch && (
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9197b3] w-4 h-4" />
+          <Input
+            placeholder={placeholder}
+            value={searchTerm}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="pl-10 bg-white border-[#cecece]"
+          />
+        </div>
+      )}
 
       {showStatusFilter && (
         <div className="flex items-center gap-2">
