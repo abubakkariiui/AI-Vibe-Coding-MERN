@@ -15,7 +15,7 @@ export function validateCustomer(customer: Partial<Customer>): FormErrors {
 
   if (!customer.phone?.trim()) {
     errors.phone = "Phone is required"
-  } else if (!/^\+?[\d\s\-$$$$]+$/.test(customer.phone)) {
+  } else if (!/^\+?[\d\s\-()]+$/.test(customer.phone)) {
     errors.phone = "Invalid phone format"
   }
 
