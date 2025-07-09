@@ -4,6 +4,7 @@ import { Users, UserCheck, UserX, Plus } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { useApp } from "../../context/AppContext"
 import { useCustomers } from "../../hooks/useApi"
 import { MetricCard } from "../shared/MetricCard"
 import { DataTable } from "../shared/DataTable"
@@ -17,7 +18,7 @@ import { ToastContainer } from "../Toast"
 
 export function CustomersPage() {
   const [page, setPage] = useState(1)
-  const [search, setSearch] = useState("")
+  const { searchTerm, setSearchTerm } = useApp()
   const [status, setStatus] = useState("")
   const [customerFormOpen, setCustomerFormOpen] = useState(false)
   const [editingCustomer, setEditingCustomer] = useState<any>(undefined)
@@ -43,7 +44,7 @@ export function CustomersPage() {
     createCustomer,
     updateCustomer,
     deleteCustomer,
-  } = useCustomers({ page, limit: 10, search, status })
+  } = useCustomers({ page, limit: 10, search: searchTerm, status })
 
   const activeCustomers = customers.filter((c: any) => c.status === "Active").length
   const inactiveCustomers = customers.filter((c: any) => c.status === "Inactive").length
@@ -150,10 +151,11 @@ export function CustomersPage() {
         <CardContent>
           {/* Search and Filter */}
           <SearchAndFilter
-            onSearch={setSearch}
+            onSearch={setSearchTerm}
             onStatusFilter={setStatus}
             placeholder="Search customers..."
             className="mb-6"
+            showSearch={false}
           />
 
           {/* Loading State */}

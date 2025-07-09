@@ -12,7 +12,7 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const { currentPage, setCurrentPage, toasts, removeToast } = useApp()
+  const { currentPage, setCurrentPage, toasts, removeToast, searchTerm, setSearchTerm } = useApp()
 
   const navigationItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -79,7 +79,12 @@ export function Layout({ children }: LayoutProps) {
           <h1 className="text-2xl font-medium text-[#1c1a21]">{getPageTitle()}</h1>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#9197b3] w-5 h-5" />
-            <Input placeholder="Search" className="pl-10 w-80 bg-white border-[#cecece]" />
+            <Input
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-80 bg-white border-[#cecece]"
+            />
           </div>
         </div>
 

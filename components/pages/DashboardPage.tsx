@@ -14,7 +14,7 @@ import { ConfirmDialog } from "../ConfirmDialog"
 import type { Customer } from "../../types"
 
 export function DashboardPage() {
-  const { customers, updateCustomer, deleteCustomer, addCustomer } = useApp()
+  const { customers, updateCustomer, deleteCustomer, addCustomer, searchTerm } = useApp()
   const [customerFormOpen, setCustomerFormOpen] = useState(false)
   const [editingCustomer, setEditingCustomer] = useState<Customer | undefined>()
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -30,6 +30,9 @@ export function DashboardPage() {
   })
 
   const activeCustomers = customers.filter((c) => c.status === "Active").length
+  const filteredCustomers = customers.filter((c) =>
+    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleEditCustomer = (customer: Customer) => {
     setEditingCustomer(customer)
@@ -94,7 +97,7 @@ export function DashboardPage() {
           </div>
 
           <DataTable
-            data={customers}
+            data={filteredCustomers}
             columns={customerColumns}
             onEdit={handleEditCustomer}
             onDelete={handleDeleteCustomer}

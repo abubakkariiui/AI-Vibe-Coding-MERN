@@ -96,6 +96,10 @@ interface AppContextType {
   addToast: (message: string, type?: "success" | "error" | "info") => void
   toasts: any[]
   removeToast: (id: string) => void
+
+  // Global search term
+  searchTerm: string
+  setSearchTerm: (term: string) => void
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -104,6 +108,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentPage, setCurrentPage] = useState("dashboard")
   const [customers, setCustomers] = useLocalStorage<Customer[]>("customers", initialCustomers)
   const [products, setProducts] = useLocalStorage<Product[]>("products", initialProducts)
+  const [searchTerm, setSearchTerm] = useState("")
   const { toasts, addToast, removeToast } = useToast()
 
   // Customer operations
@@ -168,6 +173,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addToast,
     toasts,
     removeToast,
+    searchTerm,
+    setSearchTerm,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
