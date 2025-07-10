@@ -1,4 +1,3 @@
-"use client"
 
 // Enhanced Mock MongoDB implementation with better error handling
 export interface MongoDocument {
