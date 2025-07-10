@@ -1,25 +1,21 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { mockDB } from "@/lib/mongodb"
+import { validateProduct } from "@/lib/validation"
 
 // GET /api/products/[id] - Get single product
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Mock product data
-    const mockProduct = {
-      _id: params.id,
-      name: "Premium Plan",
-      description: "Full-featured premium subscription",
-      price: 29,
-      inventory: 1000,
-      category: "Subscription",
-      status: "Active",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    const collection = mockDB.collection("products")
+    const product = await collection.findOne({ _id: params.id })
+
+    if (!product) {
+      return NextResponse.json(
+        { success: false, error: "Product not found" },
+        { status: 404 },
+      )
     }
 
-    return NextResponse.json({
-      success: true,
-      data: mockProduct,
-    })
+    return NextResponse.json({ success: true, data: product })
   } catch (error) {
     console.error("API Error:", error)
     return NextResponse.json(
@@ -37,35 +33,33 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
+    const { isValid, errors } = validateProduct(body)
 
-    // Basic validation
-    if (!body.name || !body.description) {
+    if (!isValid) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Name and description are required",
-        },
+        { success: false, error: "Validation failed", details: errors },
         { status: 400 },
       )
     }
 
-    // Mock updated product
-    const updatedProduct = {
-      _id: params.id,
-      name: body.name,
-      description: body.description,
-      price: Number.parseFloat(body.price) || 0,
-      inventory: Number.parseInt(body.inventory) || 0,
-      category: body.category || "Other",
-      status: body.status || "Active",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
+    const collection = mockDB.collection("products")
+    await collection.updateOne(
+      { _id: params.id },
+      {
+        $set: {
+          name: body.name,
+          description: body.description,
+          price: Number.parseFloat(body.price),
+          inventory: Number.parseInt(body.inventory),
+          category: body.category,
+          status: body.status || "Active",
+        },
+      },
+    )
 
-    return NextResponse.json({
-      success: true,
-      data: updatedProduct,
-    })
+    const updatedProduct = await collection.findOne({ _id: params.id })
+
+    return NextResponse.json({ success: true, data: updatedProduct })
   } catch (error) {
     console.error("API Error:", error)
     return NextResponse.json(
@@ -82,10 +76,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 // DELETE /api/products/[id] - Delete product
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    return NextResponse.json({
-      success: true,
-      message: "Product deleted successfully",
-    })
+    const collection = mockDB.collection("products")
+    const result = await collection.deleteOne({ _id: params.id })
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { success: false, error: "Product not found" },
+        { status: 404 },
+      )
+    }
+
+    return NextResponse.json({ success: true, message: "Product deleted successfully" })
   } catch (error) {
     console.error("API Error:", error)
     return NextResponse.json(
